@@ -5,14 +5,7 @@ plugins {
 }
 
 kotlin {
-    androidTarget {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "21"
-            }
-        }
-    }
-    
+    androidTarget()
     jvm("desktop")
     
     sourceSets {

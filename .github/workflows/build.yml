@@ -24,7 +24,7 @@ jobs:
         with:
           gradle-version: 8.5
           
-      - name: Grant Execute Permission for Gradlew
+      - name: Grant Execute Permission
         run: git update-index --chmod=+x gradlew
         
       - name: Build Android APK
@@ -37,10 +37,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: android-apk
-          path: "androidApp/build/outputs/apk/debug/*.apk"
+          path: "**/build/outputs/apk/debug/*.apk"
           
       - name: Upload EXE Artifact
         uses: actions/upload-artifact@v4
         with:
           name: windows-exe
-          path: "desktopApp/build/compose/binaries/main/exe/*.exe"
+          path: "**/build/compose/binaries/main/exe/*.exe"
