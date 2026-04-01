@@ -8,43 +8,55 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-val CyberDark = Color(0xFF0F0F13)
-val NeonPink = Color(0xFFFF0055)
-val ElectricCyan = Color(0xFF00E5FF)
-val CardSurface = Color(0xFF1E1E26)
-val TextPrimary = Color(0xFFFFFFFF)
-val TextSecondary = Color(0xFFA0A0AB)
+val CyberBlack = Color(0xFF050505)
+val CyberDarkGray = Color(0xFF111111)
+val CyberLightGray = Color(0xFF222222)
+val CyberWhite = Color(0xFFF0F0F0)
+val CyberAccent = Color(0xFF9146FF) // Twitch Purple for accents
 
 val OmletTypography = Typography(
     headlineLarge = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Black,
-        fontSize = 32.sp,
-        color = TextPrimary
+        fontSize = 24.sp,
+        letterSpacing = (-0.5).sp,
+        color = CyberWhite
     ),
     titleMedium = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Bold,
-        fontSize = 18.sp,
-        color = TextPrimary
+        fontSize = 16.sp,
+        color = CyberWhite
     ),
     bodyMedium = TextStyle(
-        fontFamily = FontFamily.Serif,
+        fontFamily = FontFamily.SansSerif, // Changed to SansSerif for UI as per Cyber-Professional
         fontWeight = FontWeight.Normal,
-        fontSize = 14.sp,
-        color = TextSecondary
+        fontSize = 13.sp,
+        color = Color(0xFFAAAAAA)
+    ),
+    bodyLarge = TextStyle(
+        fontFamily = FontFamily.Serif, // Serif kept for content/articles
+        fontWeight = FontWeight.Normal,
+        fontSize = 15.sp,
+        color = CyberWhite
+    ),
+    labelSmall = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.Medium,
+        fontSize = 11.sp,
+        color = CyberWhite
     )
 )
 
 val OmletColorScheme = darkColorScheme(
-    primary = NeonPink,
-    secondary = ElectricCyan,
-    background = CyberDark,
-    surface = CardSurface,
+    primary = CyberAccent,
+    secondary = CyberLightGray,
+    background = CyberBlack,
+    surface = CyberDarkGray,
     onPrimary = Color.White,
-    onSecondary = Color.Black,
-    onBackground = TextPrimary,
-    onSurface = TextPrimary
+    onSecondary = CyberWhite,
+    onBackground = CyberWhite,
+    onSurface = CyberWhite
 )
 
 @Composable

@@ -1,9 +1,11 @@
 package com.omlet.arcade.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -42,35 +44,56 @@ class HomeScreen : Screen {
         }
 
         Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-            // Top Bar
+            // Sleek Top Navigation
             Row(
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.surface)
+                    .border(1.dp, MaterialTheme.colorScheme.secondary)
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "OMLET ARCADE",
+                    text = "OMLET WORKSTATION",
                     style = MaterialTheme.typography.headlineLarge,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
 
             if (isLoading) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = MaterialTheme.colorScheme.secondary)
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                 }
             } else {
                 LazyColumn(
                     contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
+                    // Categories
                     item {
                         Text(
-                            text = "Live Now on Twitch",
-                            style = MaterialTheme.typography.titleMedium,
+                            text = "CATEGORIES",
+                            style = MaterialTheme.typography.labelSmall,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            item { CategoryChip("TWITCH", isSelected = true) }
+                            item { CategoryChip("YOUTUBE", isSelected = false) }
+                            item { CategoryChip("KICK", isSelected = false) }
+                            item { CategoryChip("DISCOVER", isSelected = false) }
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+
+                    item {
+                        Text(
+                            text = "LIVE STREAMS",
+                            style = MaterialTheme.typography.labelSmall,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
                     }
+
                     items(streams) { stream ->
                         StreamCard(stream = stream) {
                             navigator.push(StreamScreen(stream))
@@ -83,41 +106,63 @@ class HomeScreen : Screen {
 }
 
 @Composable
+fun CategoryChip(title: String, isSelected: Boolean) {
+    Box(
+        modifier = Modifier
+            .border(
+                1.dp,
+                if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
+                RoundedCornerShape(0.dp) // Sharp edges
+            )
+            .background(if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f) else Color.Transparent)
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.labelSmall,
+            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+        )
+    }
+}
+
+@Composable
 fun StreamCard(stream: TwitchStream, onClick: () -> Unit) {
-    Card(
-        modifier = Modifier.fillMaxWidth().clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(1.dp, MaterialTheme.colorScheme.secondary, RoundedCornerShape(0.dp)) // Sharp edges
+            .background(MaterialTheme.colorScheme.surface)
+            .clickable { onClick() }
     ) {
         Column {
-            Box(modifier = Modifier.fillMaxWidth().height(200.dp)) {
+            Box(modifier = Modifier.fillMaxWidth().height(180.dp)) {
                 KamelImage(
                     resource = asyncPainterResource(data = stream.thumbnail_url),
                     contentDescription = "Thumbnail",
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
-                // LIVE Badge
+                // Professional LIVE Badge
                 Box(
                     modifier = Modifier
                         .padding(8.dp)
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(Color.Red)
+                        .background(Color.Red) // Standard red for live, sharp
+                        .border(1.dp, Color(0xFF880000))
                         .padding(horizontal = 6.dp, vertical = 2.dp)
                         .align(Alignment.TopStart)
                 ) {
-                    Text("LIVE", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text("LIVE", color = Color.White, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
                 }
                 // Viewers
                 Box(
                     modifier = Modifier
                         .padding(8.dp)
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(Color.Black.copy(alpha = 0.7f))
+                        .background(Color.Black.copy(alpha = 0.8f))
+                        .border(1.dp, Color.DarkGray)
                         .padding(horizontal = 6.dp, vertical = 2.dp)
                         .align(Alignment.BottomStart)
                 ) {
-                    Text("${stream.viewer_count} viewers", color = Color.White, fontSize = 12.sp)
+                    Text("${stream.viewer_count} VIEWERS", color = Color.White, style = MaterialTheme.typography.labelSmall)
                 }
             }
             Column(modifier = Modifier.padding(12.dp)) {
@@ -126,9 +171,9 @@ fun StreamCard(stream: TwitchStream, onClick: () -> Unit) {
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 1
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(2.dp))
                 Text(
-                    text = "${stream.user_name} • ${stream.game_name}",
+                    text = "${stream.user_name.uppercase()}  //  ${stream.game_name.uppercase()}",
                     style = MaterialTheme.typography.bodyMedium
                 )
             }

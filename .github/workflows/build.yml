@@ -33,15 +33,33 @@ jobs:
       - name: Build Windows EXE
         run: ./gradlew :desktopApp:packageExe --stacktrace
         
-      - name: Collect Artifacts
-        run: |
-          mkdir dist
-          cp androidApp/build/outputs/apk/debug/*.apk dist/
-          cp desktopApp/build/compose/binaries/main/exe/*.exe dist/
-        
-      - name: Upload Artifacts
+      - name: Upload Universal APK
         uses: actions/upload-artifact@v4
         with:
-          name: omlet-arcade-builds
-          path: dist/*
+          name: omlet-arcade-universal-apk
+          path: androidApp/build/outputs/apk/debug/*universal*.apk
+          
+      - name: Upload arm64-v8a APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: omlet-arcade-arm64-v8a-apk
+          path: androidApp/build/outputs/apk/debug/*arm64-v8a*.apk
+          
+      - name: Upload armeabi-v7a APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: omlet-arcade-armeabi-v7a-apk
+          path: androidApp/build/outputs/apk/debug/*armeabi-v7a*.apk
+
+      - name: Upload x86_64 APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: omlet-arcade-x86_64-apk
+          path: androidApp/build/outputs/apk/debug/*x86_64*.apk
+          
+      - name: Upload Windows EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: omlet-arcade-windows-exe
+          path: desktopApp/build/compose/binaries/main/exe/*.exe
 
