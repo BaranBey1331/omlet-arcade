@@ -1,3 +1,5 @@
+package com.omlet.arcade
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -11,7 +13,7 @@ import androidx.compose.unit.dp
 fun App() {
     MaterialTheme(
         colorScheme = lightColorScheme(
-            primary = Color(0xFFE91E63), // Omlet pembemsi rengi
+            primary = Color(0xFFE91E63),
             background = Color.White
         )
     ) {
