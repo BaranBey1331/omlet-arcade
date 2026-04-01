@@ -2,9 +2,9 @@ name: Build EXE and APK
 
 on:
   push:
-    branches: [ main, beta, pre, nightly ]
+    branches: [ main, beta, alpha, nightly, pre ]
   pull_request:
-    branches: [ main, beta, pre, nightly ]
+    branches: [ main, beta, alpha, nightly, pre ]
 
 jobs:
   build:
@@ -23,21 +23,24 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.5
+          
+      - name: Grant Execute Permission for Gradlew
+        run: git update-index --chmod=+x gradlew
         
       - name: Build Android APK
-        run: ./gradlew :androidApp:assembleDebug
+        run: ./gradlew :androidApp:assembleDebug --stacktrace
         
       - name: Build Windows EXE
-        run: ./gradlew :desktopApp:packageExe
+        run: ./gradlew :desktopApp:packageExe --stacktrace
         
-      - name: Upload APK
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: android-apk
-          path: androidApp/build/outputs/apk/debug/*.apk
+          path: "androidApp/build/outputs/apk/debug/*.apk"
           
-      - name: Upload EXE
+      - name: Upload EXE Artifact
         uses: actions/upload-artifact@v4
         with:
           name: windows-exe
-          path: desktopApp/build/compose/binaries/main/exe/*.exe
+          path: "desktopApp/build/compose/binaries/main/exe/*.exe"
