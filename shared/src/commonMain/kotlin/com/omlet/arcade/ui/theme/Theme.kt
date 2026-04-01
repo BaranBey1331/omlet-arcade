@@ -8,55 +8,57 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-val CyberBlack = Color(0xFF050505)
-val CyberDarkGray = Color(0xFF111111)
-val CyberLightGray = Color(0xFF222222)
-val CyberWhite = Color(0xFFF0F0F0)
-val CyberAccent = Color(0xFF9146FF) // Twitch Purple for accents
+val WorkstationBlack = Color(0xFF000000)
+val WorkstationDark = Color(0xFF0A0A0C)
+val WorkstationGray = Color(0xFF141417)
+val WorkstationBorder = Color(0xFF1F1F23)
+val WorkstationText = Color(0xFFEFEFEF)
+val TwitchAccent = Color(0xFF9146FF)
 
 val OmletTypography = Typography(
     headlineLarge = TextStyle(
         fontFamily = FontFamily.SansSerif,
-        fontWeight = FontWeight.Black,
-        fontSize = 24.sp,
-        letterSpacing = (-0.5).sp,
-        color = CyberWhite
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp,
+        letterSpacing = 0.sp,
+        color = WorkstationText
     ),
     titleMedium = TextStyle(
         fontFamily = FontFamily.SansSerif,
-        fontWeight = FontWeight.Bold,
-        fontSize = 16.sp,
-        color = CyberWhite
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 14.sp,
+        color = WorkstationText
     ),
     bodyMedium = TextStyle(
-        fontFamily = FontFamily.SansSerif, // Changed to SansSerif for UI as per Cyber-Professional
+        fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Normal,
-        fontSize = 13.sp,
-        color = Color(0xFFAAAAAA)
+        fontSize = 12.sp,
+        color = Color(0xFFADADB8)
     ),
     bodyLarge = TextStyle(
-        fontFamily = FontFamily.Serif, // Serif kept for content/articles
+        fontFamily = FontFamily.Serif, // Wikipedia-style for content
         fontWeight = FontWeight.Normal,
-        fontSize = 15.sp,
-        color = CyberWhite
+        fontSize = 14.sp,
+        lineHeight = 20.sp,
+        color = WorkstationText
     ),
     labelSmall = TextStyle(
         fontFamily = FontFamily.SansSerif,
-        fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        color = CyberWhite
+        fontWeight = FontWeight.Bold,
+        fontSize = 10.sp,
+        letterSpacing = 0.5.sp,
+        color = Color.White
     )
 )
 
 val OmletColorScheme = darkColorScheme(
-    primary = CyberAccent,
-    secondary = CyberLightGray,
-    background = CyberBlack,
-    surface = CyberDarkGray,
+    primary = TwitchAccent,
+    secondary = Color.White,
+    background = WorkstationBlack,
+    surface = WorkstationGray,
+    outline = WorkstationBorder,
     onPrimary = Color.White,
-    onSecondary = CyberWhite,
-    onBackground = CyberWhite,
-    onSurface = CyberWhite
+    onSurface = WorkstationText
 )
 
 @Composable

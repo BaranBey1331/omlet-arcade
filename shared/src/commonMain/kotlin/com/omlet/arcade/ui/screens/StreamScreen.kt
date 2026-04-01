@@ -1,16 +1,12 @@
 package com.omlet.arcade.ui.screens
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -24,7 +20,6 @@ import com.omlet.arcade.data.ChatMessage
 import com.omlet.arcade.data.TwitchRepository
 import com.omlet.arcade.data.TwitchStream
 import com.omlet.arcade.ui.components.TwitchPlayer
-import kotlinx.coroutines.launch
 
 class StreamScreen(private val stream: TwitchStream) : Screen {
     @Composable
@@ -34,84 +29,109 @@ class StreamScreen(private val stream: TwitchStream) : Screen {
         val chatMessages = remember { mutableStateListOf<ChatMessage>() }
         
         LaunchedEffect(stream.user_name) {
-            repository.connectToChat(stream.user_name).collect { msg ->
+            repository.connectToChat(stream.user_name.lowercase()).collect { msg ->
                 chatMessages.add(msg)
-                if(chatMessages.size > 50) chatMessages.removeAt(0) // Keep chat buffer small
+                if(chatMessages.size > 100) chatMessages.removeAt(0)
             }
         }
 
         Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-            // Embedded Twitch Player
-            Box(modifier = Modifier.fillMaxWidth().height(250.dp).background(Color.Black)) {
+            // Real Twitch Player
+            Box(modifier = Modifier.fillMaxWidth().aspectRatio(16f/9f).background(Color.Black)) {
                 TwitchPlayer(
                     channel = stream.user_name,
                     modifier = Modifier.fillMaxSize()
                 )
                 
-                // Back Button Overlay
-                Button(
-                    onClick = { navigator.pop() },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black.copy(alpha = 0.7f)),
-                    modifier = Modifier.padding(8.dp).align(Alignment.TopStart),
-                    shape = RoundedCornerShape(0.dp) // Sharp
+                Box(
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .clickable { navigator.pop() }
+                        .background(Color.Black.copy(alpha = 0.6f))
+                        .border(1.dp, Color.Gray)
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
-                    Text("BACK", color = Color.White, style = MaterialTheme.typography.labelSmall)
+                    Text("← BACK", color = Color.White, style = MaterialTheme.typography.labelSmall)
                 }
             }
 
-            // Stream Info
+            // Stream Meta
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(text = stream.title, style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = "${stream.user_name.uppercase()}  //  ${stream.game_name.uppercase()}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(text = "${stream.viewer_count} VIEWERS", style = MaterialTheme.typography.bodyMedium)
-            }
-            
-            Divider(color = MaterialTheme.colorScheme.surface)
-
-            // Chat Area
-            Text(
-                text = "TWITCH CHAT",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-            )
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth().weight(1f),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                reverseLayout = true
-            ) {
-                items(chatMessages.reversed()) { msg ->
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(modifier = Modifier.size(8.dp).background(Color.Red))
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = buildAnnotatedString {
-                            val colorValue = try { Color(msg.color.replace("#", "FF").toLong(16)) } catch(e: Exception) { Color.White }
-                            withStyle(style = SpanStyle(color = colorValue, fontWeight = FontWeight.Bold)) {
-                                append("${msg.username}: ")
-                            }
-                            append(msg.message)
-                        },
-                        modifier = Modifier.padding(vertical = 4.dp),
-                        style = MaterialTheme.typography.bodyMedium.copy(color = Color.White)
+                        text = "${stream.user_name.uppercase()}  //  ${stream.viewer_count} VIEWERS",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
             
-            // Chat Input (Mock)
-            Row(modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface).padding(8.dp)) {
-                OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
-                    placeholder = { Text("Send a message...", style = MaterialTheme.typography.bodyMedium) },
-                    modifier = Modifier.weight(1f).height(50.dp),
-                    shape = RoundedCornerShape(0.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.secondary,
-                        focusedContainerColor = MaterialTheme.colorScheme.background,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.background
-                    )
-                )
+            Divider(color = MaterialTheme.colorScheme.outline, thickness = 1.dp)
+
+            // Real-time Chat
+            Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp),
+                    reverseLayout = true
+                ) {
+                    items(chatMessages.reversed()) { msg ->
+                        ChatLine(msg)
+                    }
+                }
+            }
+            
+            // Input Area
+            WorkstationChatInput()
+        }
+    }
+}
+
+@Composable
+fun ChatLine(msg: ChatMessage) {
+    Text(
+        text = buildAnnotatedString {
+            withStyle(style = SpanStyle(color = Color(0xFFADADB8), fontWeight = FontWeight.Bold)) {
+                append("${msg.username.uppercase()}: ")
+            }
+            append(msg.message)
+        },
+        modifier = Modifier.padding(vertical = 4.dp),
+        style = MaterialTheme.typography.bodyMedium.copy(color = Color.White)
+    )
+}
+
+@Composable
+fun WorkstationChatInput() {
+    Column {
+        Divider(color = MaterialTheme.colorScheme.outline, thickness = 1.dp)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .background(Color.Black)
+                    .border(1.dp, MaterialTheme.colorScheme.outline)
+                    .padding(horizontal = 12.dp, vertical = 10.dp)
+            ) {
+                Text("SEND MESSAGE...", color = Color.DarkGray, style = MaterialTheme.typography.labelSmall)
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Box(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.primary)
+                    .padding(horizontal = 16.dp, vertical = 10.dp)
+            ) {
+                Text("CHAT", color = Color.White, style = MaterialTheme.typography.labelSmall)
             }
         }
     }
