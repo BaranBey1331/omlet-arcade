@@ -6,7 +6,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.unit.sp
+import androidx.compose.ui.unit.sp
 
 val CyberDark = Color(0xFF0F0F13)
 val NeonPink = Color(0xFFFF0055)

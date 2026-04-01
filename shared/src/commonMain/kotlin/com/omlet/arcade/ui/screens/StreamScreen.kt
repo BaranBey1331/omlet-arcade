@@ -73,7 +73,7 @@ class StreamScreen(private val stream: TwitchStream) : Screen {
                 Text(text = "${stream.viewer_count} viewers", style = MaterialTheme.typography.bodyMedium)
             }
             
-            HorizontalDivider(color = MaterialTheme.colorScheme.surface)
+            Divider(color = MaterialTheme.colorScheme.surface)
 
             // Chat Area
             Text(
