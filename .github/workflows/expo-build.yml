@@ -1,0 +1,48 @@
+name: Expo EAS Build (APK)
+
+on:
+  push:
+    branches: [ nightly ]
+  pull_request:
+    branches: [ nightly ]
+
+jobs:
+  build:
+    name: Build Expo Android APK
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: npm
+          
+      - name: Setup Java SDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+        
+      - name: Install NPM Dependencies
+        run: npm install
+        
+      - name: Build Android APK locally on CI
+        # EAS Local Build bypasses the need for an EXPO_TOKEN or cloud queue
+        # Output will be placed at the root directory
+        run: eas build --platform android --profile preview --local --non-interactive --output app.apk
+        
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: omlet-arcade-apk
+          path: app.apk
