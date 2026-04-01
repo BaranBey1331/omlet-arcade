@@ -7,12 +7,14 @@ export interface User {
   login: string;
   display_name: string;
   profile_image_url: string;
-  broadcaster_language: string; // Used to filter streams by user's native language
+  broadcaster_language: string;
 }
 
 interface AppState {
   accessToken: string | null;
   user: User | null;
+  _hasHydrated: boolean;
+  setHasHydrated: (state: boolean) => void;
   setAuth: (token: string, user: User) => void;
   logout: () => void;
 }
@@ -22,12 +24,17 @@ export const useStore = create<AppState>()(
     (set) => ({
       accessToken: null,
       user: null,
+      _hasHydrated: false,
+      setHasHydrated: (state) => set({ _hasHydrated: state }),
       setAuth: (token, user) => set({ accessToken: token, user }),
       logout: () => set({ accessToken: null, user: null }),
     }),
     {
       name: 'omlet-arcade-storage',
       storage: createJSONStorage(() => AsyncStorage),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );

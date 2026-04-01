@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useStore } from './src/store';
@@ -11,6 +12,12 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
   const accessToken = useStore(state => state.accessToken);
+  const _hasHydrated = useStore(state => state._hasHydrated);
+
+  if (!_hasHydrated) {
+    // Return a blank black screen while local storage loads to prevent flashing the login screen.
+    return <View style={{ flex: 1, backgroundColor: '#000' }} />;
+  }
 
   return (
     <NavigationContainer>
