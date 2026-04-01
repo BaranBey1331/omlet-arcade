@@ -26,7 +26,8 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.10" 
+        // Kotlin 1.9.22 ile uyumlu olması için
+        kotlinCompilerExtensionVersion = "1.5.10"
     }
 }
 
@@ -34,6 +35,5 @@ dependencies {
     implementation(project(":shared"))
     implementation("androidx.activity:activity-compose:1.8.2")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.compose.ui:ui:1.5.4")
-    implementation("androidx.compose.material3:material3:1.1.2")
+    // androidx bağımlılıklarını shared modülündeki sürümlerle çakışmaması için sadeleştiriyoruz
 }
