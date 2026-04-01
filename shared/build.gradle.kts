@@ -5,7 +5,13 @@ plugins {
 }
 
 kotlin {
-    androidTarget()
+    androidTarget {
+        compilations.all {
+            kotlinOptions {
+                jvmTarget = "21"
+            }
+        }
+    }
     jvm("desktop")
     
     sourceSets {
@@ -15,8 +21,8 @@ kotlin {
                 implementation(compose.foundation)
                 implementation(compose.material3)
                 implementation(compose.ui)
+                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.components.resources)
-                implementation(compose.components.uiToolingPreview)
             }
         }
         val androidMain by getting {
