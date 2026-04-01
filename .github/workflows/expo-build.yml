@@ -41,6 +41,9 @@ jobs:
       - name: Generate Native Code (Prebuild)
         run: npx expo prebuild --clean --platform android
         
+      - name: Enable ABI Splits & Optimize Size
+        run: sed -i 's/def enableSeparateBuildPerCPUArchitecture = false/def enableSeparateBuildPerCPUArchitecture = true/g' android/app/build.gradle
+        
       - name: Grant Execute Permission for Gradlew
         run: chmod +x android/gradlew
         

@@ -1,6 +1,8 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-interface User {
+export interface User {
   id: string;
   login: string;
   display_name: string;
@@ -15,9 +17,17 @@ interface AppState {
   logout: () => void;
 }
 
-export const useStore = create<AppState>((set) => ({
-  accessToken: null,
-  user: null,
-  setAuth: (token, user) => set({ accessToken: token, user }),
-  logout: () => set({ accessToken: null, user: null }),
-}));
+export const useStore = create<AppState>()(
+  persist(
+    (set) => ({
+      accessToken: null,
+      user: null,
+      setAuth: (token, user) => set({ accessToken: token, user }),
+      logout: () => set({ accessToken: null, user: null }),
+    }),
+    {
+      name: 'omlet-arcade-storage',
+      storage: createJSONStorage(() => AsyncStorage),
+    }
+  )
+);

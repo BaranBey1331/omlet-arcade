@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity, SafeAreaView, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { BlurView } from 'expo-blur';
 import { useStore } from '../store';
 import { fetchLiveStreams } from '../services/TwitchApi';
 import { Theme, Typography } from '../theme/colors';
+import { OmletLogo } from '../components/OmletLogo';
 
 export const HomeScreen = ({ navigation }: any) => {
   const user = useStore(state => state.user);
@@ -10,7 +12,6 @@ export const HomeScreen = ({ navigation }: any) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch real live streams filtering by the authenticated user's native language.
     fetchLiveStreams(user?.broadcaster_language || 'en').then(data => {
       setStreams(data);
       setLoading(false);
@@ -21,34 +22,46 @@ export const HomeScreen = ({ navigation }: any) => {
   }, [user]);
 
   const renderStream = ({ item }: { item: any }) => {
-    // Helix returns thumbnail_url with {width} and {height} placeholders.
-    const thumbUrl = item.thumbnail_url.replace('{width}', '440').replace('{height}', '248');
+    const thumbUrl = item.thumbnail_url.replace('{width}', '600').replace('{height}', '338');
     
     return (
       <TouchableOpacity 
         style={styles.card} 
+        activeOpacity={0.8}
         onPress={() => navigation.navigate('Stream', { channel: item.user_login, stream: item })}
       >
         <View style={styles.thumbnailContainer}>
           <Image source={{ uri: thumbUrl }} style={styles.thumbnail} />
-          <View style={styles.liveBadge}><Text style={styles.liveText}>LIVE</Text></View>
-          <View style={styles.viewersBadge}><Text style={styles.viewersText}>{item.viewer_count} VIEWERS</Text></View>
+          
+          <BlurView intensity={80} tint="dark" style={styles.liveBadge}>
+            <View style={styles.liveDot} />
+            <Text style={styles.liveText}>LIVE</Text>
+          </BlurView>
+
+          <BlurView intensity={80} tint="dark" style={styles.viewersBadge}>
+            <Text style={styles.viewersText}>{item.viewer_count.toLocaleString()} VIEWERS</Text>
+          </BlurView>
         </View>
         <View style={styles.metaContainer}>
           <Text style={styles.title} numberOfLines={1}>{item.title}</Text>
-          <Text style={styles.subtitle}>{item.user_name.toUpperCase()}  //  {item.game_name.toUpperCase()}</Text>
+          <Text style={styles.subtitle}>{item.user_name}  •  {item.game_name}</Text>
         </View>
       </TouchableOpacity>
     );
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>OMLET WORKSTATION</Text>
-        {user?.profile_image_url && <Image source={{ uri: user.profile_image_url }} style={styles.avatar} />}
-      </View>
-      <View style={styles.divider} />
+    <View style={styles.container}>
+      {/* Glassmorphic Premium Header */}
+      <BlurView intensity={90} tint="dark" style={styles.header}>
+        <View style={styles.headerContent}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <OmletLogo width={32} height={32} />
+            <Text style={styles.headerTitle}>Omlet Premium</Text>
+          </View>
+          {user?.profile_image_url && <Image source={{ uri: user.profile_image_url }} style={styles.avatar} />}
+        </View>
+      </BlurView>
       
       {loading ? (
         <View style={styles.loader}>
@@ -60,38 +73,43 @@ export const HomeScreen = ({ navigation }: any) => {
           keyExtractor={(item) => item.id}
           renderItem={renderStream}
           contentContainerStyle={styles.list}
-          ListHeaderComponent={<Text style={styles.sectionHeader}>LIVE FOR YOU ({user?.broadcaster_language?.toUpperCase() || 'EN'})</Text>}
+          showsVerticalScrollIndicator={false}
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Theme.background,
+    backgroundColor: '#0F0F13', // Deep premium dark
   },
   header: {
+    paddingTop: 50, // Safe area approx
+    paddingBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.05)',
+    zIndex: 10,
+  },
+  headerContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
-    backgroundColor: Theme.surface
+    paddingHorizontal: 20,
   },
   headerTitle: {
     ...Typography.title,
-    fontSize: 20
+    fontSize: 20,
+    marginLeft: 10,
+    letterSpacing: -0.5,
   },
   avatar: {
-    width: 36,
-    height: 36,
-    borderWidth: 1,
-    borderColor: Theme.border,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: Theme.border
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: Theme.primary,
   },
   loader: {
     flex: 1,
@@ -100,22 +118,22 @@ const styles = StyleSheet.create({
   },
   list: {
     padding: 16,
-  },
-  sectionHeader: {
-    ...Typography.label,
-    color: Theme.primary,
-    marginBottom: 16
+    paddingTop: 24, // Space for header
   },
   card: {
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: Theme.border,
-    backgroundColor: Theme.surface
+    marginBottom: 24,
+    borderRadius: 20,
+    backgroundColor: '#1A1A1D',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.5,
+    shadowRadius: 15,
+    elevation: 8,
+    overflow: 'hidden' // Keeps the image rounded
   },
   thumbnailContainer: {
     width: '100%',
     aspectRatio: 16 / 9,
-    backgroundColor: '#000',
     position: 'relative'
   },
   thumbnail: {
@@ -124,11 +142,21 @@ const styles = StyleSheet.create({
   },
   liveBadge: {
     position: 'absolute',
-    top: 8,
-    left: 8,
+    top: 12,
+    left: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    overflow: 'hidden'
+  },
+  liveDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
     backgroundColor: Theme.danger,
-    paddingHorizontal: 6,
-    paddingVertical: 2
+    marginRight: 6
   },
   liveText: {
     ...Typography.label,
@@ -136,27 +164,28 @@ const styles = StyleSheet.create({
   },
   viewersBadge: {
     position: 'absolute',
-    bottom: 8,
-    left: 8,
-    backgroundColor: 'rgba(0,0,0,0.8)',
-    borderWidth: 1,
-    borderColor: '#333',
-    paddingHorizontal: 6,
-    paddingVertical: 2
+    bottom: 12,
+    left: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    overflow: 'hidden'
   },
   viewersText: {
     ...Typography.label,
     color: '#FFF'
   },
   metaContainer: {
-    padding: 12
+    padding: 16,
   },
   title: {
     ...Typography.subtitle,
-    marginBottom: 4
+    fontSize: 16,
+    marginBottom: 6
   },
   subtitle: {
     ...Typography.body,
-    fontSize: 12
+    fontSize: 13,
+    color: Theme.textSecondary
   }
 });
